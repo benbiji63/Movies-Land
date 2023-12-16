@@ -1,28 +1,27 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+
+import MovieCard from './components/MovieCard';
+
 import './assets/styles/app.css';
 import SearchIcon from './assets/images/search.svg';
 
+const API_URL = `http://www.omdbapi.com/?apikey=f6b216c4`;
 // f6b216c4
-
 function App() {
-  const API_URL = `http://www.omdbapi.com/?apikey=f6b216c4`;
-  const movie1 = {
-    Poster:
-      'https://m.media-amazon.com/images/M/MV5BZGY5MDI5Y2ItNDk2MS00NzJlLWJmMTEtNGYwM2Y4ZjU2MjIyXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg',
-    Title: 'Anaconda 3: Offspring',
-    Type: 'movie',
-    Year: '2008',
-    imdbID: 'tt1137996',
+  const [movies, setMovies] = useState([]);
+
+  const searchMovies = async title => {
+    const res = await fetch(`${API_URL}&s=${title}`);
+    const data = await res.json();
+    setMovies(data.Search);
+    console.log(data.Search);
+    console.log(movies);
   };
-  async function searchMovies(title) {
-    const res = await axios.get(`${API_URL}&s=${title}`);
-    const data = await res.data.Search;
-    console.log(data);
-  }
   useEffect(() => {
-    searchMovies('Anaconda');
-  });
+    searchMovies('Superman');
+  }, []);
+
   return (
     <>
       <div className="app">
@@ -36,27 +35,17 @@ function App() {
           />
           <img src={SearchIcon} alt="search" onClick={() => {}} />
         </div>
-        <div className="container">
-          <div className="movie">
-            <div>
-              <p>{movie1.year}</p>
-            </div>
-            <div>
-              <img
-                src={
-                  movie1.Poster != 'N/A'
-                    ? movie1.Poster
-                    : 'https://via.placeholder.com/400'
-                }
-                alt={movie1.title}
-              />
-            </div>
-            <div>
-              <span>{movie1.Type}</span>
-              <h3>{movie1.Title}</h3>
-            </div>
+        {movies.length > 0 ? (
+          <div className="container">
+            {movies.map(movie => {
+              <MovieCard movie={movie} />;
+            })}
           </div>
-        </div>
+        ) : (
+          <div className="empty">
+            <h2>No Movies Found</h2>
+          </div>
+        )}
       </div>
     </>
   );
